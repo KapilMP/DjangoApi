@@ -7,7 +7,7 @@ from .serializers import BookSerializer
 
 
 class BookAPIView(APIView):
-    def get(self,request):
+    def get(self, request):
         books = Book.objects.all()
-        serializer = BookSerializer(books, many = True)
+        serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
