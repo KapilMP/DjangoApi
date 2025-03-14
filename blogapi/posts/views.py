@@ -1,13 +1,16 @@
 from rest_framework.views import APIView
-#from rest_framework import generics
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Post
 from .serializers import PostSerializers
 
+from .permissions import IsAuthorOrReadOnly
+
 
 class PostList(APIView):
+    permission_classes = [IsAuthorOrReadOnly]
     def get(self,request):
         posts = Post.objects.all()
         serializer = PostSerializers(posts, many=True)
@@ -22,6 +25,8 @@ class PostList(APIView):
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 class PostDetail(APIView):
+    permission_classes = [IsAuthorOrReadOnly]
+
     def get(self,request,pk):
         post = Post.objects.get(pk = pk )
         serializer = PostSerializers(post)
@@ -45,6 +50,7 @@ class PostDetail(APIView):
     
     def delete(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
+        self.check_object_permissions(self.request, post)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
